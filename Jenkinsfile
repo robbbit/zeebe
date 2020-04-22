@@ -111,6 +111,12 @@ pipeline {
                             }
                         }
                     }
+
+                    post {
+                        always {
+                            junit testResults: "**/*/TEST*.xml", keepLongStdio: true
+                        }
+                    }
                 }
                 stage('Unit 8 (Java 8)') {
                     steps {
@@ -118,6 +124,12 @@ pipeline {
                             configFileProvider([configFile(fileId: 'maven-nexus-settings-zeebe', variable: 'MAVEN_SETTINGS_XML')]) {
                                 sh '.ci/scripts/distribution/test-java8.sh'
                             }
+                        }
+                    }
+
+                    post {
+                        always {
+                            junit testResults: "**/*/TEST*.xml", keepLongStdio: true
                         }
                     }
                 }
@@ -128,6 +140,12 @@ pipeline {
                             configFileProvider([configFile(fileId: 'maven-nexus-settings-zeebe', variable: 'MAVEN_SETTINGS_XML')]) {
                                 sh '.ci/scripts/distribution/it-java.sh'
                             }
+                        }
+                    }
+
+                    post {
+                        always {
+                            junit testResults: "**/*/TEST*.xml", keepLongStdio: true
                         }
                     }
                 }
