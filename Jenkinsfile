@@ -114,7 +114,7 @@ pipeline {
 
                     post {
                         always {
-                            junit testResults: "**/*/TEST*.xml", keepLongStdio: true
+                            junit testResults: "**/*/TEST*java.xml", keepLongStdio: true
                         }
                     }
                 }
@@ -129,7 +129,7 @@ pipeline {
 
                     post {
                         always {
-                            junit testResults: "**/*/TEST*.xml", keepLongStdio: true
+                            junit testResults: "**/*/TEST*java8.xml", keepLongStdio: true
                         }
                     }
                 }
@@ -145,7 +145,7 @@ pipeline {
 
                     post {
                         always {
-                            junit testResults: "**/*/TEST*.xml", keepLongStdio: true
+                            junit testResults: "**/*/TEST*it.xml", keepLongStdio: true
                         }
                     }
                 }
