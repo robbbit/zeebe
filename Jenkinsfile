@@ -161,10 +161,6 @@ pipeline {
             }
 
             post {
-                always {
-                    junit testResults: "**/*/TEST-*.xml", keepLongStdio: true
-                }
-
                 failure {
                     archive "**/*/surefire-reports/*-output.txt"
                 }
