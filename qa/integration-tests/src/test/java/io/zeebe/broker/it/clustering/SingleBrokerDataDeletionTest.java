@@ -68,8 +68,6 @@ public class SingleBrokerDataDeletionTest {
     }
 
     // when
-
-    // last exported position is at-most in segment 2
     ControllableExporter.updatePosition(false);
 
     // write more events
@@ -89,7 +87,13 @@ public class SingleBrokerDataDeletionTest {
     clusteringRule.waitForSnapshotAtBroker(broker);
 
     // then
-    assertThat(getSegmentsCount(broker)).isGreaterThanOrEqualTo(3);
+    final var logstream = clusteringRule.getLogStream(1);
+    final var reader = logstream.newLogStreamReader().join();
+    final var firstNonExportedPosition =
+        ControllableExporter.NOT_EXPORTED_RECORDS.get(0).getPosition();
+    reader.seek(firstNonExportedPosition);
+    assertThat(reader.hasNext()).isTrue();
+    assertThat(reader.next().getPosition()).isEqualTo(firstNonExportedPosition);
   }
 
   private int getSegmentsCount(final Broker broker) {
@@ -107,12 +111,12 @@ public class SingleBrokerDataDeletionTest {
   }
 
   public static class ControllableExporter implements Exporter {
-    static final List<Record> RECORDS = new CopyOnWriteArrayList<>();
-    static volatile boolean shouldUpdatePosition = true;
+    static final List<Record> NOT_EXPORTED_RECORDS = new CopyOnWriteArrayList<>();
+    static volatile boolean shouldExport = true;
     private Controller controller;
 
     static void updatePosition(final boolean flag) {
-      shouldUpdatePosition = flag;
+      shouldExport = flag;
     }
 
     @Override
@@ -122,9 +126,10 @@ public class SingleBrokerDataDeletionTest {
 
     @Override
     public void export(final Record record) {
-      RECORDS.add(record);
-      if (shouldUpdatePosition) {
+      if (shouldExport) {
         controller.updateLastExportedRecordPosition(record.getPosition());
+      } else {
+        NOT_EXPORTED_RECORDS.add(record);
       }
     }
   }
